@@ -1,0 +1,19 @@
+{"role": "Text Role"},
+{"role": "user", "content": "What was nbewprompt best song?"},
+{"role": "assistant", "content": "The 2020 World Series was played at Globe Life Field in Arlington, Texas."},
+{"role": "user", "content": "What was nbewprompt best song?"},
+{"role": "assistant", "content": "The 2020 World Series was played at Globe Life Field in Arlington, Texas."},
+{"role": "user", "content": "What do you think is the best Naughty by Nature song?"},
+{"role": "assistant", "content": "The entire 2020 World Series was held at the Texas Rangers' new Globe Life Field in Arlington, Texas."},
+{"role": "user", "content": "What do you think is the best Naughty by Nature song?"},
+{"role": "assistant", "content": "The World Series in 2020 was played at Globe Life Field in Arlington, Texas, USA."},
+{"role": "user", "content": "What do you think is the best Naughty by Nature song?"},
+{"role": "assistant", "content": "The 2020 World Series was played at Globe Life Field in Arlington, Texas."},
+{"role": "user", "content": "What do you think is the best Naughty by Nature song?"},
+{"role": "assistant", "content": "
+
+Thank you! How can I assist you today?"},
+{"role": "user", "content": "What do you think is the best Naughty by Nature song?"},
+{"role": "assistant", "content": "
+
+Thank you! How can I assist you today?"}
