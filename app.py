@@ -3,6 +3,8 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import openai
 import time
+from dotenv import load_dotenv
+
 
 # Load environment variables and OpenAI API key
 load_dotenv()
