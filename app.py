@@ -30,16 +30,18 @@ app = Flask(__name__)
 def receive_sms():
     # Extract message content from the SMS
     body = request.form['Body']
-    print(body)
     message = body.strip()
     print(message)
 
     # Process the incoming message with OpenAI
     response_text = send_message_to_assistant(thread_id, assistant_id, message)
+    print(response_text)
 
     # Create a Twilio MessagingResponse and send the response back
     twilio_response = MessagingResponse()
+    print(twilio_response)
     twilio_response.message(response_text)
+
     return str(twilio_response)
 
 def send_message_to_assistant(thread_id, assistant_id, message, wait_time=5):
