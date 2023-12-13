@@ -30,7 +30,9 @@ app = Flask(__name__)
 def receive_sms():
     # Extract message content from the SMS
     body = request.form['Body']
+    print(body)
     message = body.strip()
+    print(message)
 
     # Process the incoming message with OpenAI
     response_text = send_message_to_assistant(thread_id, assistant_id, message)
