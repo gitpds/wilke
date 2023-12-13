@@ -1,63 +1,56 @@
-### WILKE BOT, this is going to get out of control quickly. LEt me think about this.
-
-from flask import Flask, request, session, redirect, url_for, render_template
-from twilio.twiml.messaging_response import MessagingResponse
-from bot import text
-import openai
 import os
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
+import openai
+import time
 
-
-
-
-    
-app = Flask(__name__)
+# Load environment variables and OpenAI API key
+load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
-app.config['SECRET_KEY'] = '323434'
 
-@app.route("/", methods=("GET", "POST"))
-def index():
-    if request.method == "POST":
-        animal = request.form["animal"]
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=generate_prompt(animal),
-            temperature=0.6,
-        )
-        return redirect(url_for("index", result=response.choices[0].text))
+# Initialize the Flask application
+app = Flask(__name__)
 
-    result = request.args.get("result")
-    return render_template("index.html", result=result)
+# Define the route to receive SMS messages
+@app.route("/sms", methods=['POST'])
+def receive_sms():
+    # Extract message content, thread_id, and assistant_id from the SMS
+    body = request.form['Body']
+    try:
+        parts = body.split(',')
+        thread_id = parts[0].split(':')[1].strip()
+        assistant_id = parts[1].split(':')[1].strip()
+        message = ','.join(parts[2:]).strip()
+    except IndexError:
+        return "Incorrect message format. Please use 'thread_id:xxx,assistant_id:yyy,Your message'."
 
+    # Process the incoming message with OpenAI
+    response_text = send_message_to_assistant(thread_id, assistant_id, message)
 
-def generate_prompt(animal):
-    return """Suggest three names for an animal that is a superhero!
+    # Create a Twilio MessagingResponse and send the response back
+    twilio_response = MessagingResponse()
+    twilio_response.message(response_text)
+    return str(twilio_response)
 
-Animal: Cat
-Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-Animal: Dog
-Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-Animal: {}
-Names:""".format(
-        animal.capitalize()
+def send_message_to_assistant(thread_id, assistant_id, message, wait_time=5):
+    # Function to interact with OpenAI
+    client = openai.Client()
+    client.beta.threads.messages.create(
+        thread_id=thread_id,
+        role="user",
+        content=message
     )
+    run = client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant_id
+    )
+    time.sleep(wait_time)
+    messages = client.beta.threads.messages.list(thread_id)
+    for msg in reversed(messages.data):
+        if msg.role == 'assistant':
+            return msg.content[0].text.value
+    return "No response from the assistant."
 
-
-
-
-@app.route("/text", methods=("GET", "POST"))
-def text_bot():
-    incoming_msg = request.values.get('Body')
-    # chat_log = session.get('chat_log')
-    # answer = ask(incoming_msg, chat_log)
-    answer = text(incoming_msg)
-    # session['chat_log'] = append_interaction_to_chat_log(incoming_msg,  answer, chat_log)
-    msg = MessagingResponse()
-    msg.message(answer)
-    return str(msg)
-
-
-
-
+# Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True)
-    
