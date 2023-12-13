@@ -1,14 +1,25 @@
 import os
+import time
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import openai
-import time
-from dotenv import load_dotenv
+from google.cloud import secretmanager
 
+# Function to access secrets from Google Secret Manager
+def access_secret_version(secret_id):
+    project_id = os.getenv('GCP_PROJECT_ID')  # Set this as an environment variable
+    client = secretmanager.SecretManagerServiceClient()
+    name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+    response = client.access_secret_version(request={"name": name})
+    return response.payload.data.decode("UTF-8")
 
 # Load environment variables and OpenAI API key
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = access_secret_version("OPENAI_API_KEY")
+
+# Fetch thread_id and assistant_id from Secret Manager
+thread_id = access_secret_version("WILKE_THREAD")
+assistant_id = access_secret_version("WILKE_ID")
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -16,15 +27,9 @@ app = Flask(__name__)
 # Define the route to receive SMS messages
 @app.route("/sms", methods=['POST'])
 def receive_sms():
-    # Extract message content, thread_id, and assistant_id from the SMS
+    # Extract message content from the SMS
     body = request.form['Body']
-    try:
-        parts = body.split(',')
-        thread_id = parts[0].split(':')[1].strip()
-        assistant_id = parts[1].split(':')[1].strip()
-        message = ','.join(parts[2:]).strip()
-    except IndexError:
-        return "Incorrect message format. Please use 'thread_id:xxx,assistant_id:yyy,Your message'."
+    message = body.strip()
 
     # Process the incoming message with OpenAI
     response_text = send_message_to_assistant(thread_id, assistant_id, message)
