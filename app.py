@@ -1,6 +1,6 @@
 import os
 import time
-from flask import Flask, request
+from flask import Flask, request, make_response
 from twilio.twiml.messaging_response import MessagingResponse
 import openai
 from google.cloud import secretmanager
@@ -39,10 +39,13 @@ def receive_sms():
 
     # Create a Twilio MessagingResponse and send the response back
     twilio_response = MessagingResponse()
-    print(twilio_response)
     twilio_response.message(response_text)
-
-    return str(twilio_response)
+    print(twilio_response)
+    
+    response = make_response(str(twilio_response))
+    print(response)
+    response.headers["Content-Type"] = "text/xml"
+    return response
 
 def send_message_to_assistant(thread_id, assistant_id, message, wait_time=5):
     # Function to interact with OpenAI
