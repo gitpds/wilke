@@ -31,19 +31,19 @@ def receive_sms():
     # Extract message content from the SMS
     body = request.form['Body']
     message = body.strip()
-    print(message)
+    # print(message)
 
     # Process the incoming message with OpenAI
     response_text = send_message_to_assistant(thread_id, assistant_id, message)
-    print(response_text)
+    # print(response_text)
 
     # Create a Twilio MessagingResponse and send the response back
     twilio_response = MessagingResponse()
     twilio_response.message(response_text)
-    print(twilio_response)
+    # print(twilio_response)
     
     response = make_response(str(twilio_response))
-    print(response)
+    # print(response)
     response.headers["Content-Type"] = "text/xml"
     return response
 
