@@ -4,6 +4,7 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import openai
 from google.cloud import secretmanager
+from dotenv import load_dotenv
 
 # Function to access secrets from Google Secret Manager
 def access_secret_version(secret_id):
