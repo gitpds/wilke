@@ -61,7 +61,7 @@ def send_message_to_assistant(thread_id, assistant_id, message, wait_time=5):
     )
     time.sleep(wait_time)
     messages = client.beta.threads.messages.list(thread_id)
-    for msg in reversed(messages.data):
+    for msg in (messages.data):
         if msg.role == 'assistant':
             return msg.content[0].text.value
     return "No response from the assistant."
